@@ -12,7 +12,8 @@ export async function up(knex: Knex) {
 
         table.string('player').notNullable();
 
-        table.string('position').notNullable();
+        table.string('position_x').notNullable();
+        table.string('position_y').notNullable();
     });
 }
 
