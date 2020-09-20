@@ -1,17 +1,32 @@
 import { Request, Response } from 'express';
 import knex from '../database/connection';
 
+import MovementUtils from '../utils/MovementUtils';
+
 
 interface Positions{
     x: string,
     y: string
 }
 
+interface Game{
+    id: string,
+    firstPlayer: string,
+    turnPlayer: string,
+}
+
+interface Board{
+    game_id: string;
+    player: string;
+    position_x: string;
+    position_y: string;
+}
+
 class MovementController{
     async create(request: Request, response:Response) {
         const { id } = request.params;
         
-        const game = await knex('game').where('id', id).first();
+        const game: Game = await knex('game').where('id', id).first();
 
         if(!game) {
             return response.status(400).json({ msg: 'Partida não encontrada' });
@@ -30,8 +45,16 @@ class MovementController{
             position_x: position.x,
             position_y: position.y
         }
-    
-        await knex('movement').insert(movement);
+        const movementUtils = new MovementUtils;
+
+        movementUtils.doMovement(game, movement);
+
+        const board: Board[] = await knex('movement')
+            .where('game_id', game.id);
+
+        if(movementUtils.checkWinner(board)){
+            console.log()
+        };
     
         return response.json({ player, position });
     }

@@ -2,7 +2,7 @@ import Knex from "knex";
 
 export async function up(knex: Knex) {
     return knex.schema.createTable('game', table => {
-        table.increments('id').primary();
+        table.string('id').primary();
         table.string('firstPlayer').notNullable();
         table.string('turnPlayer').notNullable();
     });
