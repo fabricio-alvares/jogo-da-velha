@@ -89,6 +89,7 @@ class MovementUtils {
             }
             return false;
         };
+        
         function checkDiagonal(board: string[][]) {
             return (
                 (checkIsEqual(board[0][0], board[1][1], board[2][2]))
