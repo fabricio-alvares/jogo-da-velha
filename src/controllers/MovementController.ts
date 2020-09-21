@@ -4,38 +4,38 @@ import knex from '../database/connection';
 import MovementUtils from '../utils/MovementUtils';
 
 
-interface Positions{
+interface Positions {
     x: string,
     y: string
 }
 
-interface Game{
+interface Game {
     id: string,
     firstPlayer: string,
     turnPlayer: string,
 }
 
-interface Board{
+interface Board {
     game_id: string;
     player: string;
-    position_x: string;
-    position_y: string;
+    position_x: number;
+    position_y: number;
 }
 
-class MovementController{
-    async create(request: Request, response:Response) {
+class MovementController {
+    async create(request: Request, response: Response) {
         const { id } = request.params;
-        
+
         const game: Game = await knex('game').where('id', id).first();
 
-        if(!game) {
+        if (!game) {
             return response.status(400).json({ msg: 'Partida não encontrada' });
         }
 
         const position: Positions = request.body.position;
         const { player } = request.body;
 
-        if(player != game.turnPlayer){
+        if (player != game.turnPlayer) {
             return response.status(400).json({ msg: 'Não é turno do jogador' });
         }
 
@@ -52,11 +52,15 @@ class MovementController{
         const board: Board[] = await knex('movement')
             .where('game_id', game.id);
 
+        movementUtils.checkWinner(board)
+
         if(movementUtils.checkWinner(board)){
-            console.log()
-        };
-    
-        return response.json({ player, position });
+            return response.json({ msg: "Partida finalizada", winner: movement.player });
+        }else if(movementUtils.checkDraw(board)){
+            return response.json({ msg: "Partida finalizada", winner: "Draw"});
+        }else{
+            return response.json({ player, position });
+        }
     }
 }
 
